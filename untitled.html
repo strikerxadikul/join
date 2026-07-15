@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SACTION X10</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #03020d;
+    color: #e0e0ff;
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(80,40,200,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(80,40,200,0.08) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove { from { background-position: 0 0; } to { background-position: 40px 40px; } }
+
+  .particle {
+    position: fixed; border-radius: 50%; pointer-events: none; z-index: 1;
+    animation: float linear infinite;
+    opacity: 0.18;
+  }
+  @keyframes float {
+    0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+    10% { opacity: 0.18; }
+    90% { opacity: 0.18; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+
+  .wrap { position: relative; z-index: 2; max-width: 860px; margin: 0 auto; padding: 0 20px 60px; }
+
+  .hero { text-align: center; padding: 64px 20px 48px; }
+  .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #7c3aed, #2563eb);
+    color: #fff;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 28px;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(124,58,237,0.5);
+    animation: badgePulse 2.5s ease-in-out infinite;
+  }
+  @keyframes badgePulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(124,58,237,0.5); }
+    50% { box-shadow: 0 0 40px rgba(124,58,237,0.9), 0 0 80px rgba(37,99,235,0.4); }
+  }
+  .hero-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(48px, 8vw, 88px);
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #c4b5fd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+    animation: logoShimmer 3s ease-in-out infinite;
+  }
+  @keyframes logoShimmer {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3); }
+  }
+  .hero-sub {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(12px, 2vw, 16px);
+    letter-spacing: 6px;
+    color: #7c3aed;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero-desc {
+    font-size: 18px;
+    color: #a0a0c0;
+    max-width: 520px;
+    margin: 0 auto 36px;
+    line-height: 1.7;
+  }
+
+  .cta-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #7c3aed, #2563eb);
+    color: #fff;
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 16px 36px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 30px rgba(124,58,237,0.6);
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute; top: -50%; left: -60%;
+    width: 40%; height: 200%;
+    background: rgba(255,255,255,0.15);
+    transform: skewX(-20deg);
+    animation: sweep 3s ease-in-out infinite;
+  }
+  @keyframes sweep { 0%, 100% { left: -60%; } 50% { left: 120%; } }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(124,58,237,0.9); }
+
+  .btn-outline {
+    background: transparent;
+    color: #a78bfa;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 16px 28px;
+    border: 1.5px solid #7c3aed;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: rgba(124,58,237,0.15); box-shadow: 0 0 20px rgba(124,58,237,0.4); }
+
+  .stats-row {
+    display: flex; gap: 2px; margin-bottom: 60px;
+    background: rgba(124,58,237,0.08);
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 12px; overflow: hidden;
+  }
+  .stat-item {
+    flex: 1; text-align: center; padding: 20px 12px;
+    border-right: 1px solid rgba(124,58,237,0.15);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 26px; font-weight: 900;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .stat-label { font-size: 12px; letter-spacing: 2px; color: #6060a0; text-transform: uppercase; margin-top: 4px; }
+
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+    color: #e0e0ff;
+  }
+  .section-title span { color: #a78bfa; }
+  .section-under { text-align: center; font-size: 15px; color: #6060a0; margin-bottom: 36px; letter-spacing: 1px; }
+  .divider {
+    width: 60px; height: 2px;
+    background: linear-gradient(90deg, #7c3aed, #2563eb);
+    margin: 0 auto 10px;
+    border-radius: 2px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 60px;
+  }
+  .feat-card {
+    background: rgba(10, 8, 30, 0.8);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 12px;
+    padding: 24px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: default;
+  }
+  .feat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #7c3aed, transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .feat-card:hover { transform: translateY(-4px); border-color: rgba(124,58,237,0.6); }
+  .feat-card:hover::before { opacity: 1; }
+
+  .feat-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 14px;
+  }
+  .feat-icon.purple { background: rgba(124,58,237,0.2); }
+  .feat-icon.blue { background: rgba(37,99,235,0.2); }
+  .feat-icon.pink { background: rgba(219,39,119,0.2); }
+  .feat-icon.teal { background: rgba(20,184,166,0.2); }
+
+  .feat-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px; font-weight: 700;
+    color: #d0d0f0; margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .feat-desc { font-size: 14px; color: #7070a0; line-height: 1.6; }
+
+  .rank-section { margin-bottom: 60px; }
+  .rank-row {
+    display: flex; gap: 12px;
+    background: rgba(10,8,30,0.8);
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 12px; padding: 8px;
+  }
+  .rank-item {
+    flex: 1; text-align: center; padding: 24px 12px;
+    border-radius: 8px;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .rank-item.new { background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.3); }
+  .rank-item.pro { background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.4); }
+  .rank-item.elite {
+    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(37,99,235,0.2));
+    border: 1px solid rgba(167,139,250,0.5);
+    box-shadow: 0 0 30px rgba(124,58,237,0.2);
+  }
+  .rank-crown { font-size: 32px; margin-bottom: 10px; display: block; }
+  .rank-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 1px; margin-bottom: 6px;
+  }
+  .rank-item.new .rank-name { color: #60a5fa; }
+  .rank-item.pro .rank-name { color: #a78bfa; }
+  .rank-item.elite .rank-name { color: #fbbf24; }
+  .rank-item .rank-desc { font-size: 13px; color: #6060a0; }
+  .hot-badge {
+    position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: #fff; font-size: 10px; font-weight: 700;
+    padding: 3px 10px; border-radius: 12px;
+    font-family: 'Orbitron', monospace; letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .form-section {
+    background: rgba(10,8,30,0.9);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 16px; padding: 36px 32px;
+    margin-bottom: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-section::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #7c3aed, #2563eb, #7c3aed);
+    background-size: 200% 100%;
+    animation: gradMove 3s linear infinite;
+  }
+  @keyframes gradMove { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+
+  .step-indicator {
+    display: flex; gap: 8px; align-items: center;
+    justify-content: center; margin-bottom: 32px;
+  }
+  .step-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700;
+    transition: all 0.3s;
+  }
+  .step-dot.done { background: #7c3aed; color: #fff; box-shadow: 0 0 12px rgba(124,58,237,0.6); }
+  .step-dot.active { background: linear-gradient(135deg, #7c3aed, #2563eb); color: #fff; box-shadow: 0 0 20px rgba(124,58,237,0.8); }
+  .step-dot.pending { background: rgba(124,58,237,0.1); color: #4040a0; border: 1px solid rgba(124,58,237,0.2); }
+  .step-line { flex: 1; height: 1px; background: rgba(124,58,237,0.2); max-width: 60px; }
+  .step-line.done { background: #7c3aed; }
+
+  .step-panel { display: none; }
+  .step-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .form-row { margin-bottom: 20px; }
+  .form-label {
+    display: block; font-size: 13px; font-weight: 700;
+    letter-spacing: 1.5px; color: #8a8abf; text-transform: uppercase;
+    margin-bottom: 8px; font-family: 'Rajdhani', sans-serif;
+  }
+  .form-label span { color: #ff4a4a; margin-left: 2px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; background: rgba(20,16,50,0.8);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 8px; padding: 12px 16px;
+    color: #e0e0ff; font-size: 15px; font-family: 'Rajdhani', sans-serif;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+  }
+  .form-textarea { resize: none; height: 90px; }
+  .form-select option { background: #0d0b20; color: #e0e0ff; }
+  .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .form-row-2 { grid-template-columns: 1fr; gap: 0; } }
+
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .skill-tag {
+    padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    border: 1px solid rgba(124,58,237,0.3); cursor: pointer;
+    background: rgba(124,58,237,0.08); color: #a078d0;
+    transition: all 0.2s; user-select: none;
+    font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
+  }
+  .skill-tag.selected {
+    background: rgba(124,58,237,0.25); border-color: #7c3aed;
+    color: #d0a0ff; box-shadow: 0 0 10px rgba(124,58,237,0.3);
+  }
+
+  .avatar-upload {
+    width: 100px; height: 100px; border-radius: 12px;
+    border: 2px dashed rgba(124,58,237,0.4); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(124,58,237,0.05); transition: all 0.2s;
+    color: #6060a0; font-size: 12px; text-align: center; gap: 6px;
+  }
+  .avatar-upload:hover { border-color: #7c3aed; background: rgba(124,58,237,0.1); }
+  .avatar-upload .icon { font-size: 28px; }
+
+  .form-nav { display: flex; gap: 12px; margin-top: 28px; }
+  .btn-next, .btn-prev {
+    padding: 13px 28px; border-radius: 8px; cursor: pointer;
+    font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700;
+    letter-spacing: 1px; transition: all 0.2s;
+  }
+  .btn-next {
+    flex: 1; background: linear-gradient(135deg, #7c3aed, #2563eb);
+    color: #fff; border: none; box-shadow: 0 0 20px rgba(124,58,237,0.4);
+  }
+  .btn-next:hover { box-shadow: 0 0 35px rgba(124,58,237,0.7); transform: translateY(-1px); }
+  .btn-prev {
+    background: transparent; color: #a78bfa;
+    border: 1px solid rgba(124,58,237,0.4);
+  }
+  .btn-prev:hover { background: rgba(124,58,237,0.1); }
+
+  /* WhatsApp Submit Button Style */
+  .btn-whatsapp {
+    width: 100%;
+    background: linear-gradient(135deg, #25d366, #128c7e);
+    color: #fff;
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 16px 36px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(37,211,102,0.4);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .btn-whatsapp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(37,211,102,0.7);
+  }
+
+  .success-screen { display: none; text-align: center; padding: 40px 20px; }
+  .success-screen.show { display: block; animation: fadeIn 0.5s ease; }
+  .success-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, #25d366, #128c7e);
+    margin: 0 auto 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    box-shadow: 0 0 40px rgba(37,211,102,0.6);
+    animation: successPop 0.5s ease 0.1s both;
+  }
+  @keyframes successPop {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .success-title {
+    font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900;
+    background: linear-gradient(135deg, #25d366, #60a5fa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 12px;
+  }
+  .success-msg { font-size: 16px; color: #8080b0; line-height: 1.7; }
+
+  .sub-section-header {
+    border-left: 3px solid #7c3aed;
+    padding-left: 10px;
+    margin: 25px 0 15px 0;
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    color: #a78bfa;
+    letter-spacing: 1px;
+  }
+
+  .announce-section { margin-bottom: 60px; }
+  .announce-card {
+    display: flex; align-items: flex-start; gap: 16px;
+    background: rgba(10,8,30,0.8);
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 10px; padding: 18px 20px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .announce-card:hover { border-color: rgba(124,58,237,0.5); }
+  .announce-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    margin-top: 7px; flex-shrink: 0;
+  }
+  .announce-dot.live { background: #4ade80; box-shadow: 0 0 8px #4ade80; animation: blink 1.5s ease-in-out infinite; }
+  .announce-dot.new { background: #a78bfa; }
+  .announce-dot.info { background: #60a5fa; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .announce-body .tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    font-family: 'Orbitron', monospace; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .announce-body .tag.live { color: #4ade80; }
+  .announce-body .tag.new { color: #a78bfa; }
+  .announce-body .tag.info { color: #60a5fa; }
+  .announce-body p { font-size: 14px; color: #a0a0c0; line-height: 1.6; }
+  .announce-time { font-size: 11px; color: #404060; margin-top: 4px; letter-spacing: 1px; }
+
+  .footer { text-align: center; padding: 40px 20px 0; }
+  .footer-logo {
+    font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 900;
+    background: linear-gradient(135deg, #7c3aed, #2563eb);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 12px;
+  }
+  .footer-tagline { font-size: 13px; color: #4040a0; letter-spacing: 2px; margin-bottom: 24px; }
+  .footer-line { height: 1px; background: rgba(124,58,237,0.15); margin-bottom: 20px; }
+  .footer-copy { font-size: 12px; color: #30305a; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div id="particles"></div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">⚡ Official Joining Platform ⚡</div>
+    <div class="hero-logo">SACTION<br>X10</div>
+    <div class="hero-sub">Elite Digital Community</div>
+    <p class="hero-desc">Join the most powerful team platform. Build your identity. Level up your rank. One team. One vision. One X10 power.</p>
+    <div class="cta-row">
+      <button class="btn-primary" onclick="document.getElementById('join-form').scrollIntoView({behavior:'smooth'})">⚡ Join Now</button>
+      <button class="btn-outline" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Explore Features</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-num">X10</div><div class="stat-label">Power Level</div></div>
+    <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">Elite Ranks</div></div>
+    <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label">Secure</div></div>
+    <div class="stat-item"><div class="stat-num">24/7</div><div class="stat-label">Active</div></div>
+  </div>
+
+  <!-- FEATURES -->
+  <div id="features">
+    <div class="section-title"><span>Key</span> Features</div>
+    <div class="divider"></div>
+    <div class="section-under">Everything you need to dominate the game</div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon purple">🏠</div>
+        <div class="feat-title">Ultra Modern Home</div>
+        <div class="feat-desc">Neon UI with smooth animations, team logo, and one-click join access.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon blue">🔐</div>
+        <div class="feat-title">Secure Login</div>
+        <div class="feat-desc">Email + password system with fast authentication and Google login ready.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon pink">📝</div>
+        <div class="feat-title">Smart Join Form</div>
+        <div class="feat-desc">Auto-step form with profile picture upload and skill selection system.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon teal">📩</div>
+        <div class="feat-title">Instant Application</div>
+        <div class="feat-desc">One-click submit with auto confirmation and direct admin notification.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon purple">📊</div>
+        <div class="feat-title">Member Dashboard</div>
+        <div class="feat-desc">Track your rank progression from New → Pro → Elite with leaderboard.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon blue">📢</div>
+        <div class="feat-title">Announcement Hub</div>
+        <div class="feat-desc">Admin broadcasts, team news, and event updates in real time.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RANK SYSTEM -->
+  <div class="rank-section">
+    <div class="section-title">Member <span>Rank System</span></div>
+    <div class="divider"></div>
+    <div class="section-under">Prove yourself. Climb the ladder.</div>
+    <div class="rank-row">
+      <div class="rank-item new">
+        <span class="rank-crown">🔵</span>
+        <div class="rank-name">New Member</div>
+        <div class="rank-desc">Starting point. Build your profile and get verified.</div>
+      </div>
+      <div class="rank-item pro">
+        <span class="rank-crown">🟣</span>
+        <div class="rank-name">Pro Member</div>
+        <div class="rank-desc">Active contributors with unlocked team privileges.</div>
+      </div>
+      <div class="rank-item elite" style="position:relative;">
+        <div class="hot-badge">★ TOP TIER</div>
+        <span class="rank-crown">👑</span>
+        <div class="rank-name">Elite Member</div>
+        <div class="rank-desc">The X10 inner circle. Maximum access and recognition.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOIN FORM -->
+  <div class="form-section" id="join-form">
+    <div class="section-title" style="margin-bottom:6px;">Apply to <span>Join X10</span></div>
+    <div class="section-under" style="margin-bottom:28px;">Complete your application in 3 quick steps (All Fields Required)</div>
+
+    <div class="step-indicator" id="step-indicator">
+      <div class="step-dot active" id="dot-1">1</div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step-dot pending" id="dot-2">2</div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step-dot pending" id="dot-3">3</div>
+    </div>
+
+    <div id="form-body">
+      <!-- Step 1: Personal Info -->
+      <div class="step-panel active" id="step-1">
+        <div class="sub-section-header">১. ব্যক্তিগত তথ্য (Personal Details)</div>
+        
+        <div class="form-row">
+          <label class="form-label">পুরো নাম (সার্টিফিকেট অনুযায়ী) <span>*</span></label>
+          <input class="form-input" placeholder="Enter Full Name" id="f-name"/>
+        </div>
+        
+        <div class="form-row">
+          <label class="form-label">পিতার নাম <span>*</span></label>
+          <input class="form-input" placeholder="Enter Father's Name" id="f-father"/>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-row">
+            <label class="form-label">জন্ম তারিখ <span>*</span></label>
+            <input class="form-input" type="date" id="f-dob"/>
+          </div>
+          <div class="form-row">
+            <label class="form-label">রক্তের গ্রুপ <span>*</span></label>
+            <select class="form-select" id="f-blood">
+              <option value="">নির্বাচন করুন</option>
+              <option>A+</option><option>A-</option>
+              <option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option>
+              <option>O+</option><option>O-</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">NID / জন্ম নিবন্ধন নম্বর <span>*</span></label>
+          <input class="form-input" type="number" placeholder="Enter NID or Birth Certificate Number" id="f-nid"/>
+        </div>
+
+        <div class="form-nav">
+          <button class="btn-next" onclick="goStep(2)">Next Step →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Contact & Devices -->
+      <div class="step-panel" id="step-2">
+        <div class="sub-section-header">২. যোগাযোগের তথ্য ও ডিভাইস (Contact & Gadgets)</div>
+        
+        <div class="form-row-2">
+          <div class="form-row">
+            <label class="form-label">সক্রিয় মোবাইল নম্বর <span>*</span></label>
+            <input class="form-input" type="tel" placeholder="Active Mobile Number" id="f-phone"/>
+          </div>
+          <div class="form-row">
+            <label class="form-label">হোয়াটসঅ্যাপ নম্বর <span>*</span></label>
+            <input class="form-input" type="tel" placeholder="WhatsApp Number" id="f-whatsapp"/>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">জরুরি যোগাযোগ নম্বর (পরিবার) <span>*</span></label>
+          <input class="form-input" type="tel" placeholder="Emergency Contact Number" id="f-emg-phone"/>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-row">
+            <label class="form-label">টি-শার্ট সাইজ <span>*</span></label>
+            <select class="form-select" id="f-tshirt">
+              <option value="">নির্বাচন করুন</option>
+              <option>S</option><option>M</option>
+              <option>L</option><option>XL</option><option>XXL</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">ল্যাপটপ আছে কি না? <span>*</span></label>
+            <select class="form-select" id="f-laptop">
+              <option>হ্যাঁ</option>
+              <option>না</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">দৈনিক কত সময় দিতে পারবেন? <span>*</span></label>
+          <input class="form-input" placeholder="যেমন: ৪-৫ ঘণ্টা" id="f-time"/>
+        </div>
+
+        <div class="form-nav">
+          <button class="btn-prev" onclick="goStep(1)">← Back</button>
+          <button class="btn-next" onclick="goStep(3)">Next Step →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Social & Skills -->
+      <div class="step-panel" id="step-3">
+        <div class="sub-section-header">৩. সোশ্যাল মিডিয়া ও দক্ষতা (Skills & Socials)</div>
+
+        <div class="form-row">
+          <label class="form-label">ফেসবুক প্রোফাইল লিংক <span>*</span></label>
+          <input class="form-input" placeholder="https://facebook.com/username" id="f-fb"/>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">টিকток আইডি এর লিংক (যদি থাকে)</label>
+          <input class="form-input" placeholder="https://linkedin.com/in/username" id="f-linkedin"/>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">Select Your Skills <span>*</span></label>
+          <div class="skills-grid">
+            <span class="skill-tag" onclick="toggleSkill(this)">Gaming</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Design</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Coding</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Marketing</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Content</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Leadership</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Strategy</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">কেন আপনি X10 টিমে যোগ দিতে চান? <span>*</span></label>
+          <textarea class="form-textarea" placeholder="আপনার অনুপ্রেরণা এবং অভিজ্ঞতা শেয়ার করুন..." id="f-why"></textarea>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">আপনার ছবি</label>
+          <div style="display:flex; align-items:center; gap:20px;">
+            <div class="avatar-upload" id="avatar-box">
+              <span class="icon">📷</span>
+              <span>Upload</span>
+            </div>
+            <div style="font-size:13px; color:#6060a0; line-height:1.7;">নিচে ক্লিক করে তথ্য জমা দেওয়ার পর হোয়াটসঅ্যাপে আপনার ছবি পাঠাতে হবে।</div>
+          </div>
+        </div>
+
+        <div class="form-nav">
+          <button class="btn-prev" onclick="goStep(2)">← Back</button>
+          <button class="btn-whatsapp" onclick="submitToWhatsApp()">💬 আবেদন জমা দিন (WHATSAPP)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="success-screen" id="success-screen">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Application Sent to WhatsApp!</div>
+      <p class="success-msg">Welcome to the SACTION X10 family.<br>হোয়াটসঅ্যাপে আপনার চ্যাটটি ওপেন হলে Send বাটনে চাপুন।<br>Your application is under review. Stay elite. 💎</p>
+    </div>
+  </div>
+
+  <!-- ANNOUNCEMENTS -->
+  <div class="announce-section">
+    <div class="section-title"><span>Team</span> Announcements</div>
+    <div class="divider"></div>
+    <div class="section-under" style="margin-bottom:24px;">Latest from the X10 command center</div>
+
+    <div class="announce-card">
+      <div class="announce-dot live"></div>
+      <div class="announce-body">
+        <div class="tag live">Live</div>
+        <p>Season 1 Elite recruitment is now officially open. Limited spots available — apply before the deadline.</p>
+        <div class="announce-time">Today • 2:00 PM</div>
+      </div>
+    </div>
+    <div class="announce-card">
+      <div class="announce-dot new"></div>
+      <div class="announce-body">
+        <div class="tag new">New</div>
+        <p>Member dashboard v2.0 launched with full leaderboard, rank tracker, and team stats.</p>
+        <div class="announce-time">Yesterday • 10:30 AM</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-logo">SACTION X10</div>
+    <div class="footer-tagline">DEVOLOPER STRIKER LIMON · One Vision · One X10 Power</div>
+    <div class="footer-line"></div>
+    <div class="footer-copy">© 2026 SACTION X10 · All rights reserved</div>
+  </div>
+
+</div>
+
+<script>
+  // Background particles animation
+  (function() {
+    const c = document.getElementById('particles');
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 4 + 2;
+      p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${Math.random()>0.5?'#7c3aed':'#2563eb'};animation-duration:${8+Math.random()*14}s;animation-delay:${Math.random()*12}s;`;
+      c.appendChild(p);
+    }
+  })();
+
+  // Form Step Changer
+  function goStep(n) {
+    for (let i = 1; i <= 3; i++) {
+      const panel = document.getElementById('step-' + i);
+      const dot = document.getElementById('dot-' + i);
+      if(panel && dot) {
+        panel.classList.toggle('active', i === n);
+        dot.className = 'step-dot ' + (i < n ? 'done' : i === n ? 'active' : 'pending');
+      }
+      if (i < 3) {
+        const line = document.getElementById('line-' + i);
+        if(line) line.classList.toggle('done', i < n);
+      }
+    }
+    document.getElementById('join-form').scrollIntoView({behavior:'smooth'});
+  }
+
+  // Skill Selector Toggle
+  function toggleSkill(el) { el.classList.toggle('selected'); }
+
+  // Core WhatsApp Submission Functionality
+  function submitToWhatsApp() {
+    // Collect all inputs
+    const name = document.getElementById('f-name').value.trim();
+    const father = document.getElementById('f-father').value.trim();
+    const dob = document.getElementById('f-dob').value;
+    const blood = document.getElementById('f-blood').value;
+    const nid = document.getElementById('f-nid').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    const whatsapp = document.getElementById('f-whatsapp').value.trim();
+    const emgPhone = document.getElementById('f-emg-phone').value.trim();
+    const tshirt = document.getElementById('f-tshirt').value;
+    const laptop = document.getElementById('f-laptop').value;
+    const time = document.getElementById('f-time').value.trim();
+    const fb = document.getElementById('f-fb').value.trim();
+    const linkedin = document.getElementById('f-linkedin').value.trim() || 'Not Provided';
+    const why = document.getElementById('f-why').value.trim();
+
+    // Get selected skills
+    let selectedSkills = [];
+    document.querySelectorAll('.skill-tag.selected').forEach(tag => {
+      selectedSkills.push(tag.innerText);
+    });
+    const skillsList = selectedSkills.length > 0 ? selectedSkills.join(', ') : 'None Selected';
+
+    // Simple validation rule for critical fields
+    if(!name || !father || !dob || !blood || !nid || !phone || !whatsapp || !emgPhone || !tshirt || !time || !fb || !why) {
+      alert("দয়া করে সব বাধ্যতামূলক (*) ঘরগুলো সঠিকভাবে পূরণ করুন!");
+      return;
+    }
+
+    // ⚠️ এখানে আপনার আসল হোয়াটসঅ্যাপ নম্বরটি কান্ট্রি কোড সহ বসান (যেমন: 8801700000000)
+    const targetWhatsAppNumber = "+8801757-035417"; 
+
+    // Message Formatting Template
+    const messageText = `⚡ *NEW SACTION X10 APPLICATION* ⚡\n\n` +
+                        `👤 *১. ব্যক্তিগত তথ্য:* \n` +
+                        `• নাম: ${name}\n` +
+                        `• পিতার নাম: ${father}\n` +
+                        `• জন্ম তারিখ: ${dob}\n` +
+                        `• রক্তের গ্রুপ: ${blood}\n` +
+                        `• NID/BRN: ${nid}\n\n` +
+                        `📞 *২. যোগাযোগের তথ্য ও ডিভাইস:* \n` +
+                        `• মোবাইল: ${phone}\n` +
+                        `• হোয়াটসঅ্যাপ: ${whatsapp}\n` +
+                        `• জরুরি নম্বর: ${emgPhone}\n` +
+                        `• টি-শার্ট সাইজ: ${tshirt}\n` +
+                        `• ল্যাপটপ: ${laptop}\n` +
+                        `• দৈনিক সময়: ${time}\n\n` +
+                        `🌐 *৩. সোশ্যাল মিডিয়া ও দক্ষতা:* \n` +
+                        `• ফেসবুক: ${fb}\n` +
+                        `• লিঙ্কডইন/টিকটক: ${linkedin}\n` +
+                        `• স্কিলস: ${skillsList}\n\n` +
+                        `📝 *টিমে যোগ দেওয়ার কারণ:* \n${why}`;
+
+    // URL Encoding for special characters safely
+    const encodedMessage = encodeURIComponent(messageText);
+    const whatsAppUrl = `https://api.whatsapp.com/send?phone=${targetWhatsAppNumber}&text=${encodedMessage}`;
+
+    // Hide standard layout & trigger completion views
+    document.getElementById('form-body').style.display = 'none';
+    document.getElementById('step-indicator').style.display = 'none';
+    document.getElementById('success-screen').classList.add('show');
+
+    // Route user directly onto WhatsApp client endpoint
+    setTimeout(() => {
+      window.open(whatsAppUrl, '_blank');
+    }, 800);
+  }
+</script>
+</body>
+</html>
